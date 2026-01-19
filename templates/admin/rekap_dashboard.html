@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static humanize %}
+
+{% block content %}
+<div id="content-main">
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
+        <form method="get" style="display: flex; gap: 15px; align-items: flex-end;">
+            <input type="date" name="dari" value="{{ tgl_mulai }}">
+            <input type="date" name="sampai" value="{{ tgl_selesai }}">
+            <button type="submit" class="button" style="background: #28a745;">Lihat Evaluasi Mitra</button>
+        </form>
+    </div>
+
+    {% if hasil %}
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+        {% for c in hasil.rekap_cabang %}
+        <div
+            style="background: #fff; padding: 15px; border-radius: 8px; border-top: 4px solid #2196f3; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <h4 style="margin: 0; color: #666; font-size: 0.9rem; text-transform: uppercase;">
+                📍 {{ c.laporan_induk__cabang__nama_cabang }}
+            </h4>
+            <p style="margin: 5px 0 0; color: #2C3E50; font-size: 1.5rem; font-weight: bold;">
+                {{ c.jumlah_berangkat }} <span style="font-size: 0.8rem; color: #999;">Kali</span>
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <thead>
+            <tr style="background: #333; color: #fff; text-align: left;">
+                <th style="padding: 12px;">Nama Mitra</th>
+                <th style="padding: 12px;">⏱️ Total Durasi (Jam)</th>
+                <th style="padding: 12px;">📉 Total Minus</th>
+                <th style="padding: 12px;">💰 Total Omset</th>
+                <th style="padding: 12px;">📅 Kehadiran</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in hasil.rekap_mitra %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold; color: #2C3E50;">{{ m.mitra__nama_lengkap }}</td>
+                <td style="padding: 12px; font-weight: bold; color: #2C3E50;">{{ m.total_jam|floatformat:1 }} Jam</td>
+                <td style="padding: 12px; font-weight: bold; color: #dc3545;">Rp {{ m.total_minus|default:0|intcomma }}
+                </td>
+                <td style="padding: 12px; font-weight: bold; color: #1DB954;">Rp {{ m.total_omset|default:0|intcomma }}
+                </td>
+                <td style="padding: 12px; font-weight: bold; color: #2C3E50;">{{ m.kehadiran }}x berangkat</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<script>
+</script>
+{% endblock %}
