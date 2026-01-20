@@ -81,6 +81,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mmds_project.wsgi.application'
 
+# Hosting Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://tukudata.up.railway.app',
+    'https://*.up.railway.app'
+]
+
 # --- DATABASE
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
