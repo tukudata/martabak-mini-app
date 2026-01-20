@@ -1,6 +1,6 @@
-/* Mengecilkan logo di halaman login */
+/* Mengecilkan logo di halaman Login */
 .login-box .login-logo img {
-    max-width: 150px !important;
-    /* Ubah angka ini sesuai keinginan */
+    max-width: 120px !important;
     height: auto !important;
+    margin-bottom: 10px;
 }

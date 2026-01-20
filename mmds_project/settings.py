@@ -157,6 +157,7 @@ JAZZMIN_SETTINGS = {
     "site_brand": "TukuData Software",
     "site_icon": "images/logo.png",
     "site_logo": "images/logo.jpg",
+    "login_logo": "images/logo.png",
     "welcome_sign": "Selamat Datang di Dayung Sari",
     "copyright": "TukuData Ltd",
     "search_model": ["auth.User"],
