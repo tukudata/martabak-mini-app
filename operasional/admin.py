@@ -18,6 +18,19 @@ class DetailLHInline(admin.TabularInline):
         'potongan_es', 'potongan_gas', 'potongan_obat', 'potongan_qris',
         'display_omzet', 'display_selisih')
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "mitra" and not request.user.is_superuser:
+            # SUPER KETAT:
+            # 1. Harus Mitra
+            # 2. Harus Aktif
+            # 3. Harus yang bertugas di cabang yang dipimpin oleh user login
+            kwargs["queryset"] = Karyawan.objects.filter(
+                jabatan__icontains='mitra',
+                status='AKTIF',
+                cabang_tugas__kepala_cabang__user=request.user
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     # semua display di bawah ini, datanya kita ambil langsung dari field database
     def display_target(self, obj):
         if obj.pk:
@@ -120,22 +133,26 @@ class SetorPusatInline(admin.StackedInline):
 class LHCabangAdmin(admin.ModelAdmin):
     list_display = ('tanggal', 'cabang', 'dibuat_oleh')
     inlines = [DetailLHInline, PengeluaranInline, SetorPusatInline]
-    
-    # Masukkan Pagar Authentication yang sudah kita buat sebelumnya di sini
+
+    # 1. KETAT: Hanya lihat laporan cabang miliknya
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser: return qs
+        if request.user.is_superuser: 
+            return qs
+        return qs.filter(cabang__kepala_cabang__user=request.user)
 
-        return qs.filter(dibuat_oleh=request.user)
-        # return qs.filter(cabang__kepala_cabang__user=request.user)
+    # 2. KETAT: Saat klik "Add", hanya muncul cabang miliknya di pilihan
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "cabang" and not request.user.is_superuser:
+            from perusahaan.models import Cabang
+            kwargs["queryset"] = Cabang.objects.filter(kepala_cabang__user=request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    ## tambahan
+    # 3. OTOMATIS: Catat siapa yang login (ID Staff)
     def save_model(self, request, obj, form, change):
-        # Jika data baru (bukan edit), set pembuatnya adalah user yang login
         if not obj.pk:
             obj.dibuat_oleh = request.user
-        super().save_model(request, obj, form, change)
-    ## sampai sini
+        super().save_model(request, obj, form, change)    
 
 @admin.register(RekapLaporan)
 class RekapLaporanAdmin(admin.ModelAdmin):

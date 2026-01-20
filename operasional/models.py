@@ -54,7 +54,7 @@ class LHCabang(models.Model):
 
 class DetailLH(models.Model):
     laporan_induk = models.ForeignKey(LHCabang, related_name='detail_lh', on_delete=models.CASCADE)
-    mitra = models.ForeignKey(Karyawan, on_delete=models.CASCADE, limit_choices_to={'jabatan__icontains': 'mitra'})
+    mitra = models.ForeignKey(Karyawan, on_delete=models.PROTECT, limit_choices_to={'jabatan__icontains': 'mitra'})
 
     STATUS_KEHADIRAN = [
         ('H', 'Hadir'),
