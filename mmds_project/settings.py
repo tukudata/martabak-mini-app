@@ -88,7 +88,8 @@ import dj_database_url # Opsional: sangat disarankan untuk parsing URL database
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
+        default=os.getenv('DATABASE_URL'),
+        engine='django.db.backends.postgresql'
     )
 }
 
