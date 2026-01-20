@@ -1,0 +1,1 @@
+web: gunicorn mmds_project.wsgi:application
