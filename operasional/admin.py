@@ -118,14 +118,24 @@ class SetorPusatInline(admin.StackedInline):
 
 @admin.register(LHCabang)
 class LHCabangAdmin(admin.ModelAdmin):
-    list_display = ('tanggal', 'cabang')
+    list_display = ('tanggal', 'cabang', 'dibuat_oleh')
     inlines = [DetailLHInline, PengeluaranInline, SetorPusatInline]
     
     # Masukkan Pagar Authentication yang sudah kita buat sebelumnya di sini
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser: return qs
-        return qs.filter(cabang__kepala_cabang__user=request.user)
+
+        return qs.filter(dibuat_oleh=request.user)
+        # return qs.filter(cabang__kepala_cabang__user=request.user)
+
+    ## tambahan
+    def save_model(self, request, obj, form, change):
+        # Jika data baru (bukan edit), set pembuatnya adalah user yang login
+        if not obj.pk:
+            obj.dibuat_oleh = request.user
+        super().save_model(request, obj, form, change)
+    ## sampai sini
 
 @admin.register(RekapLaporan)
 class RekapLaporanAdmin(admin.ModelAdmin):

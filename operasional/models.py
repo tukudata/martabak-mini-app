@@ -12,6 +12,16 @@ class LHCabang(models.Model):
     cabang = models.ForeignKey(Cabang, on_delete=models.CASCADE)
     tanggal = models.DateField(default=timezone.now)
 
+    ## tambahan
+    dibuat_oleh = models.ForeignKey(
+        'auth.User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        editable=False # Supaya tidak muncul di form input (otomatis)
+    )
+    ## sampai sini
+
     # --- PERHITUNGAN TOTAL UNTUK MENU SETOR PUSAT ---
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
