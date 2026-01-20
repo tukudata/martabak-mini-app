@@ -160,6 +160,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Selamat Datang di Dayung Sari",
     "copyright": "TukuData Ltd",
     "search_model": ["auth.User"],
+    "custom_css": "login_custom.css",
     
     # Menu Samping
     "navigation_expanded": True,

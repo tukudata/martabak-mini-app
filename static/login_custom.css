@@ -1,0 +1,6 @@
+/* Mengecilkan logo di halaman login */
+.login-box .login-logo img {
+    max-width: 150px !important;
+    /* Ubah angka ini sesuai keinginan */
+    height: auto !important;
+}
