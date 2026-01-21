@@ -29,7 +29,6 @@ class Karyawan(models.Model):
     jabatan = models.CharField(max_length=100)
     tanggal_masuk = models.DateField()
     status = models.CharField(max_length=10, choices=STATUS_PILIHAN, default='AKTIF')
-    alamat = models.TextField(blank=True, null=True, help_text="Opsional")
     cabang_tugas = models.ForeignKey('Cabang', on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_cabang')
 
     def save(self, *args, **kwargs):
