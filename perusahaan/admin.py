@@ -8,7 +8,7 @@ class DepartemenAdmin(admin.ModelAdmin):
 @admin.register(Karyawan)
 class KaryawanAdmin(admin.ModelAdmin):
     list_display = ('id_staff', 'nama_lengkap', 'nomor_hp', 'jabatan', 'cabang_tugas')
-    list_filter = ('status', 'jabatan') # filter dropdown
+    list_filter = ('jabatan', 'cabang_tugas') # filter dropdown
     search_fields = ('id_staff', 'nama_lengkap', 'nomor_hp') # kolom search
     
 @admin.register(Cabang)
