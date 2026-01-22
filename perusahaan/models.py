@@ -24,7 +24,7 @@ class Karyawan(models.Model):
                                 blank=True, # Di Form Admin boleh kosong
                                 help_text="ID Staff otomatis dibuatkan oleh sistem.")
     nama_lengkap = models.CharField(max_length=255)
-    nomor_hp = models.CharField(max_length=15, unique=True)
+    nomor_hp = models.CharField(max_length=15, unique=False)
     departemen = models.ForeignKey(Departemen, on_delete=models.SET_NULL, null=True) # on delete penting banget
     jabatan = models.CharField(max_length=100)
     tanggal_masuk = models.DateField()
