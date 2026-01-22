@@ -1,10 +1,12 @@
 from django.db import models
 from django.db.models import Q
-from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.core.exceptions import ValidationError # edit pesan error
-from PIL import Image
-import io
 from django.core.files.base import ContentFile
+from django.utils import timezone
+import io
+from PIL import Image
 from perusahaan.models import Karyawan, Cabang
 from sistem.models import AturanPerusahaan
 
@@ -12,7 +14,6 @@ class LHCabang(models.Model):
     cabang = models.ForeignKey(Cabang, on_delete=models.CASCADE)
     tanggal = models.DateField(default=timezone.now)
 
-    ## tambahan
     dibuat_oleh = models.ForeignKey(
         'auth.User', 
         on_delete=models.SET_NULL, 
@@ -20,30 +21,6 @@ class LHCabang(models.Model):
         blank=True,
         editable=False # Supaya tidak muncul di form input (otomatis)
     )
-    ## sampai sini
-
-    # --- PERHITUNGAN TOTAL UNTUK MENU SETOR PUSAT ---
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        
-        # hitung seluruh cash mitra dan pengeluaran
-        total_cash = sum(d.cash_diterima for d in self.detail_lh.all())
-        total_keluar = sum(p.nominal for p in self.pengeluaran_op.all())
-        
-        # hitung selisihnya
-        total_setor = total_cash - total_keluar
-        
-        # Panggil fungsi save milik SetorPusat secara manual (update_or_create)
-        # Ini akan memaksa data masuk ke database
-        from .models import SetorPusat # Import lokal agar tidak sirkular
-        SetorPusat.objects.update_or_create(
-            laporan_induk=self,
-            defaults={
-                'total_cash_mitra': total_cash,
-                'total_pengeluaran': total_keluar,
-                'nominal_setor': total_setor
-            }
-        )
     
     class Meta:
         verbose_name_plural = "Laporan Harian"
@@ -233,6 +210,31 @@ class SetorPusat(models.Model):
             # Masukkan kembali ke field bukti_transfer
             self.bukti_transfer = ContentFile(output.read(), name=self.bukti_transfer.name)
         super().save(*args, **kwargs)
+
+    @receiver(post_save, sender=DetailLH)
+    @receiver(post_save, sender=PengeluaranLH)
+    def update_setor_pusat(sender, instance, **kwargs):
+        # Ambil laporan induknya
+        induk = instance.laporan_induk
+    
+        # Hitung total cash dari semua DetailLH
+        total_cash = sum(d.cash_diterima for d in induk.detail_lh.all())
+    
+        # Hitung total pengeluaran dari semua PengeluaranLH
+        total_keluar = sum(p.nominal for p in induk.pengeluaran_op.all())
+    
+        # Hitung nominal setor
+        total_setor = total_cash - total_keluar
+    
+        # Update atau buat data di SetorPusat
+        SetorPusat.objects.update_or_create(
+            laporan_induk=induk,
+            defaults={
+                'total_cash_mitra': total_cash,
+                'total_pengeluaran': total_keluar,
+                'nominal_setor': total_setor
+            }
+        )
 
     class Meta:
         verbose_name_plural = "Setor Harian"
