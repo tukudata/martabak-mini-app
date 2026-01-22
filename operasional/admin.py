@@ -131,35 +131,41 @@ class SetorPusatInline(admin.StackedInline):
     extra = 1
     max_num = 1
     
-    # Kita tampilkan sebagai field baca saja (readonly)
+    # Perhatikan: Kita tidak pakai obj (SetorPusat), tapi kita hitung dari induk (LHCabang)
     readonly_fields = ('display_cash', 'display_pengeluaran', 'display_wajib_setor')
     fields = ('display_cash', 'display_pengeluaran', 'display_wajib_setor', 'bukti_transfer')
 
     def display_cash(self, obj):
-        if obj.pk:
-            return f"Rp {obj.total_cash_mitra:,}"
-        return "-"
-    display_cash.short_description = "Total Cash Mitra"
+        # Tambahkan pengecekan obj.pk agar tidak error saat tambah data baru
+        if not obj or not obj.pk:
+            return "Simpan laporan dahulu"
+        total = obj.laporan_induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
+        return f"Rp {total:,}"
 
     def display_pengeluaran(self, obj):
-        if obj.pk:
-            return f"Rp {obj.total_pengeluaran:,}"
-        return "-"
-    display_pengeluaran.short_description = "Total Pengeluaran"
+        if not obj or not obj.pk:
+            return "Simpan laporan dahulu"
+        total = obj.laporan_induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
+        return f"Rp {total:,}"
 
     def display_wajib_setor(self, obj):
-        if obj.pk and obj.nominal_setor is not None:
-            nilai = obj.nominal_setor
-            html_string = f"""
-                <strong id="nominal_copy" style="color: orange; font-size: 16px; margin-right: 10px;">Rp {nilai:,}</strong>
-                <button type="button" onclick="navigator.clipboard.writeText('{nilai}')" 
-                    style="cursor: pointer; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #f8f9fa; font-size: 11px;">
-                    📋 Copy
-                </button>
-            """
-            return mark_safe(html_string)
-        return "-"
-    display_wajib_setor.short_description = "JUMLAH YANG HARUS DITRANSFER"
+        if not obj or not obj.pk:
+            return mark_safe("<em>Simpan detail & pengeluaran di atas dahulu untuk melihat total.</em>")
+        
+        cash = obj.laporan_induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
+        keluar = obj.laporan_induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
+        nilai = cash - keluar
+        
+        html_string = f"""
+            <strong style="color: #28a745; font-size: 18px; margin-right: 10px;">Rp {nilai:,}</strong>
+            <button type="button" onclick="navigator.clipboard.writeText('{nilai}')" 
+                style="cursor: pointer; padding: 4px 10px; border-radius: 4px; border: 1px solid #28a745; background: white; color: #28a745; font-weight: bold;">
+                📋 COPY NOMINAL
+            </button>
+            <p style="color: gray; font-size: 11px; margin-top: 5px;">*Angka ini mengikuti data Detail & Pengeluaran di atas.</p>
+        """
+        return mark_safe(html_string)
+    display_wajib_setor.short_description = "JUMLAH TRANSFER"
 
 @admin.register(LHCabang)
 class LHCabangAdmin(admin.ModelAdmin):

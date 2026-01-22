@@ -100,7 +100,7 @@ class DetailLH(models.Model):
             for field in ['adonan_bawa_gr', 'adonan_sisa_gr', 'cash_diterima', 'potongan_es', 
                           'potongan_gas', 'potongan_obat', 'potongan_qris']: setattr(self, field, 0)
             # Set durasi kerja langsung ke "-"
-            self.durasi_kerja = "-"
+            self.durasi_kerja = 0
 
         # ambil harga per gr
         aturan = self.get_aturan()
@@ -179,14 +179,25 @@ class PengeluaranLH(models.Model):
 
 class SetorPusat(models.Model):
     laporan_induk = models.OneToOneField(LHCabang, on_delete=models.CASCADE, related_name='setoran_pusat')
-    
-    total_cash_mitra = models.PositiveIntegerField(default=0, editable=False)
-    total_pengeluaran = models.PositiveIntegerField(default=0, editable=False)
-    nominal_setor = models.PositiveIntegerField(default=0, editable=False)
+    total_cash_mitra = models.PositiveIntegerField(default=0)
+    total_pengeluaran = models.PositiveIntegerField(default=0)
+    nominal_setor = models.PositiveIntegerField(default=0)
     bukti_transfer = models.ImageField(upload_to='setoran_pusat/%Y/%m/')
 
-    # kompres foto
     def save(self, *args, **kwargs):
+        # HANYA SAAT SAVE: Tarik data asli dari tabel Detail & Pengeluaran
+        from django.db.models import Sum
+        
+        # Hitung real-time dari database
+        cash = self.laporan_induk.detail_lh.aggregate(total=Sum('cash_diterima'))['total'] or 0
+        keluar = self.laporan_induk.pengeluaran_op.aggregate(total=Sum('nominal'))['total'] or 0
+        
+        # Kunci angkanya ke dalam database tabel SetorPusat
+        self.total_cash_mitra = cash
+        self.total_pengeluaran = keluar
+        self.nominal_setor = cash - keluar
+        
+        ## -- KOMPRES FOTO --
         if self.bukti_transfer:
             img = Image.open(self.bukti_transfer)
 
@@ -207,6 +218,7 @@ class SetorPusat(models.Model):
 
             # Masukkan kembali ke field bukti_transfer
             self.bukti_transfer = ContentFile(output.read(), name=self.bukti_transfer.name)
+
         super().save(*args, **kwargs)
 
     class Meta:
@@ -216,38 +228,3 @@ class RekapLaporan(models.Model):
     class Meta:
         verbose_name_plural = "Rekap Laporan"
         managed = False  # Penting: Django tidak akan buat tabel di database
-
-# PERBAIKI BUG SETOR PUSAT
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-
-@receiver(post_save, sender=DetailLH)
-@receiver(post_save, sender=PengeluaranLH)
-@receiver(post_delete, sender=DetailLH)
-@receiver(post_delete, sender=PengeluaranLH)
-def update_setor_pusat(sender, instance, **kwargs):
-    induk = instance.laporan_induk
-    
-    # Hitung ulang secara total dari database
-    # Menggunakan sum() langsung pada queryset lebih akurat daripada loop manual
-    from django.db.models import Sum
-    
-    # Ambil total cash dari detail
-    res_cash = induk.detail_lh.aggregate(total=Sum('cash_diterima'))
-    total_cash = res_cash['total'] or 0
-    
-    # Ambil total pengeluaran
-    res_keluar = induk.pengeluaran_op.aggregate(total=Sum('nominal'))
-    total_keluar = res_keluar['total'] or 0
-    
-    total_setor = total_cash - total_keluar
-    
-    # Update_or_create di sini
-    SetorPusat.objects.update_or_create(
-        laporan_induk=induk,
-        defaults={
-            'total_cash_mitra': total_cash,
-            'total_pengeluaran': total_keluar,
-            'nominal_setor': total_setor
-        }
-    )
