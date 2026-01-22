@@ -185,14 +185,15 @@ class SetorPusat(models.Model):
     bukti_transfer = models.ImageField(upload_to='setoran_pusat/%Y/%m/')
 
     def save(self, *args, **kwargs):
-        # HANYA SAAT SAVE: Tarik data asli dari tabel Detail & Pengeluaran
+        # PROTEKSI: Jika tidak ada bukti transfer, jangan simpan apapun ke tabel ini
+        if not self.bukti_transfer:
+            return # Batalkan proses simpan
+            
+        # Jika ada foto, baru jalankan hitungan untuk "mengunci" angka ke database
         from django.db.models import Sum
-        
-        # Hitung real-time dari database
         cash = self.laporan_induk.detail_lh.aggregate(total=Sum('cash_diterima'))['total'] or 0
         keluar = self.laporan_induk.pengeluaran_op.aggregate(total=Sum('nominal'))['total'] or 0
         
-        # Kunci angkanya ke dalam database tabel SetorPusat
         self.total_cash_mitra = cash
         self.total_pengeluaran = keluar
         self.nominal_setor = cash - keluar

@@ -125,46 +125,45 @@ class PengeluaranInline(admin.TabularInline):
             else:
                 kwargs["queryset"] = Karyawan.objects.none()                
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-    
+
 class SetorPusatInline(admin.StackedInline):
     model = SetorPusat
     extra = 1
     max_num = 1
-    
-    # Perhatikan: Kita tidak pakai obj (SetorPusat), tapi kita hitung dari induk (LHCabang)
     readonly_fields = ('display_cash', 'display_pengeluaran', 'display_wajib_setor')
     fields = ('display_cash', 'display_pengeluaran', 'display_wajib_setor', 'bukti_transfer')
 
     def display_cash(self, obj):
-        # Tambahkan pengecekan obj.pk agar tidak error saat tambah data baru
-        if not obj or not obj.pk:
-            return "Simpan laporan dahulu"
-        total = obj.laporan_induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
+        # Ambil laporannya langsung dari parent (induk) yang sedang dibuka
+        # obj.laporan_induk bekerja baik saat EDIT maupun saat baru mau ADD
+        induk = obj.laporan_induk if hasattr(obj, 'laporan_induk') else None
+        if not induk: return "Rp 0"
+        
+        total = induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
         return f"Rp {total:,}"
 
     def display_pengeluaran(self, obj):
-        if not obj or not obj.pk:
-            return "Simpan laporan dahulu"
-        total = obj.laporan_induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
+        induk = obj.laporan_induk if hasattr(obj, 'laporan_induk') else None
+        if not induk: return "Rp 0"
+        
+        total = induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
         return f"Rp {total:,}"
 
     def display_wajib_setor(self, obj):
-        if not obj or not obj.pk:
-            return mark_safe("<em>Simpan detail & pengeluaran di atas dahulu untuk melihat total.</em>")
-        
-        cash = obj.laporan_induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
-        keluar = obj.laporan_induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
+        induk = obj.laporan_induk if hasattr(obj, 'laporan_induk') else None
+        if not induk: return "Rp 0"
+
+        cash = induk.detail_lh.aggregate(Sum('cash_diterima'))['cash_diterima__sum'] or 0
+        keluar = induk.pengeluaran_op.aggregate(Sum('nominal'))['nominal__sum'] or 0
         nilai = cash - keluar
         
-        html_string = f"""
+        return mark_safe(f"""
             <strong style="color: #28a745; font-size: 18px; margin-right: 10px;">Rp {nilai:,}</strong>
             <button type="button" onclick="navigator.clipboard.writeText('{nilai}')" 
                 style="cursor: pointer; padding: 4px 10px; border-radius: 4px; border: 1px solid #28a745; background: white; color: #28a745; font-weight: bold;">
                 📋 COPY NOMINAL
             </button>
-            <p style="color: gray; font-size: 11px; margin-top: 5px;">*Angka ini mengikuti data Detail & Pengeluaran di atas.</p>
-        """
-        return mark_safe(html_string)
+        """)
     display_wajib_setor.short_description = "JUMLAH TRANSFER"
 
 @admin.register(LHCabang)
