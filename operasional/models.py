@@ -50,7 +50,7 @@ class DetailLH(models.Model):
     cash_diterima = models.PositiveIntegerField(default=0)
     potongan_es = models.PositiveIntegerField(default=0)
     potongan_gas = models.PositiveIntegerField(default=0)
-    potongan_obat = models.PositiveIntegerField(default=0)
+    potongan_parkir = models.PositiveIntegerField(default=0)
     potongan_qris = models.PositiveIntegerField(default=0)
 
     # --- KOLOM DATABASE (HASIL HITUNG PERMANEN) ---
@@ -98,7 +98,7 @@ class DetailLH(models.Model):
         if self.status_kehadiran != 'H':
             # Nol kan semua field angka
             for field in ['adonan_bawa_gr', 'adonan_sisa_gr', 'cash_diterima', 'potongan_es', 
-                          'potongan_gas', 'potongan_obat', 'potongan_qris']: setattr(self, field, 0)
+                          'potongan_gas', 'potongan_parkir', 'potongan_qris']: setattr(self, field, 0)
             # Set durasi kerja langsung ke "-"
             self.durasi_kerja = 0
 
@@ -110,7 +110,7 @@ class DetailLH(models.Model):
 
         potongan = [
             self.cash_diterima, self.potongan_es, self.potongan_gas, 
-            self.potongan_obat, self.potongan_qris
+            self.potongan_parkir, self.potongan_qris
         ]
         self.omzet_bruto_rp = sum(p or 0 for p in potongan)
         

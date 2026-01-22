@@ -47,7 +47,7 @@ class DetailLHInline(admin.TabularInline):
     fields = (
         'mitra', 'status_kehadiran', 'jam_berangkat', 'adonan_bawa_gr', 'display_target',
         'jam_pulang', 'display_durasi_kerja', 'adonan_sisa_gr', 'display_sisa_rp', 'cash_diterima', 
-        'potongan_es', 'potongan_gas', 'potongan_obat', 'potongan_qris',
+        'potongan_es', 'potongan_gas', 'potongan_parkir', 'potongan_qris',
         'display_omzet', 'display_selisih')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
