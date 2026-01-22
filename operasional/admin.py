@@ -1,13 +1,45 @@
 from django.contrib import admin
 from django.db.models import Q, Sum, Count, FloatField, ExpressionWrapper
 from django.shortcuts import render
+from django.template.response import TemplateResponse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from .models import LHCabang, DetailLH, PengeluaranLH, SetorPusat, RekapLaporan
 from perusahaan.models import Karyawan
 
+def dashboard_hari_ini(request, extra_context=None):
+    hari_ini = timezone.localtime(timezone.now()).date()
+    
+    laporan_induk = LHCabang.objects.filter(tanggal=hari_ini)
+    if not request.user.is_superuser:
+        laporan_induk = laporan_induk.filter(cabang__kepala_cabang__user=request.user)
+    
+    detail_laporan = DetailLH.objects.filter(
+        laporan_induk__in=laporan_induk, 
+        status_kehadiran='H'
+    )
+    
+    context = {
+        **admin.site.each_context(request), # Ambil context asli admin secara manual
+        'title': 'Hari Ini',
+        'total_cabang': laporan_induk.count(),
+        'total_karyawan': detail_laporan.count(),
+        'total_omzet': detail_laporan.aggregate(total=Sum('omzet_bruto_rp'))['total'] or 0,
+        'total_minus': detail_laporan.filter(selisih_rp__lt=0).count(),
+    }
+    
+    if extra_context:
+        context.update(extra_context)
+    
+    # Gunakan TemplateResponse langsung ke index.html
+    return TemplateResponse(request, "admin/index.html", context)
+
+# Tetap gunakan ini untuk menimpa halaman utama
+admin.site.index = dashboard_hari_ini
+
 class DetailLHInline(admin.TabularInline):     
     model = DetailLH
-    extra = 8
+    extra = 7
     max_num = 8
 
     readonly_fields = ('display_target', 'display_sisa_rp', 'display_omzet', 'display_selisih', 'display_durasi_kerja')

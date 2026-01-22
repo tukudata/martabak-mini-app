@@ -1,85 +1,51 @@
 {% extends "admin/index.html" %}
-{% load i18n static %}
+{% load i18n static humanize %}
+
+{% block content_title %}
+<h4> Hari Ini </h4>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner"><h3>{{ total_cabang }}</h3><p>Gerobak Aktif</p></div>
+            <div class="small-box" style="background-color: #663399; color: white;">
+                <div class="inner">
+                    <h3>{{ total_cabang }}</h3>
+                    <p>Cabang Aktif</p>
+                </div>
                 <div class="icon"><i class="fas fa-shopping-cart"></i></div>
             </div>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner"><h3>{{ total_karyawan }}</h3><p>Mitra Aktif</p></div>
+            <div class="small-box" style="background-color: #1E90FF; color: white;">
+                <div class="inner">
+                    <h3>{{ total_karyawan }}</h3>
+                    <p>Mitra Aktif</p>
+                </div>
                 <div class="icon"><i class="fas fa-users"></i></div>
             </div>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner"><h3>Rp ?</h3><p>Omset Bulan Ini</p></div>
+            <div class="small-box" style="background-color: #28A745; color: white;">
+                <div class="inner">
+                    <h3>Rp {{ total_omzet|intcomma }}</h3>
+                    <p>Omzet Hari Ini</p>
+                </div>
                 <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
             </div>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner"><h3>3</h3><p>Laporan Minus</p></div>
+            <div class="small-box" style="background-color: #DC3545; color: white;">
+                <div class="inner">
+                    <h3>{{ total_minus }}</h3>
+                    <p>Minus Hari Ini</p>
+                </div>
                 <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card card-primary card-outline">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-line mr-1"></i> Tren Penjualan Mingguan</h3></div>
-                <div class="card-body">
-                    <canvas id="salesChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-info card-outline">
-                <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> Komposisi Menu</h3></div>
-                <div class="card-body">
-                    <canvas id="pieChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Grafik Batang/Garis (Tren Penjualan)
-    new Chart(document.getElementById('salesChart'), {
-        type: 'line',
-        data: {
-            labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-            datasets: [{
-                label: 'Penjualan (Juta)',
-                data: [12, 19, 13, 15, 22, 30, 25],
-                borderColor: '#007bff',
-                fill: false
-            }]
-        },
-        options: { maintainAspectRatio: false }
-    });
-
-    // Grafik Lingkaran (Komposisi Menu)
-    new Chart(document.getElementById('pieChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Martabak Manis', 'Martabak Telur', 'Minuman'],
-            datasets: [{
-                data: [60, 30, 10],
-                backgroundColor: ['#f39c12', '#dd4b39', '#00c0ef']
-            }]
-        },
-        options: { maintainAspectRatio: false }
-    });
-</script>
 {% endblock %}
 
 {% block sidebar_second %}{% endblock %}
