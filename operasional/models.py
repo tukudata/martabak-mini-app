@@ -1,9 +1,7 @@
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError # edit pesan error
-from django.core.files.base import ContentFile
 from django.utils import timezone
 import io
 from PIL import Image
@@ -211,6 +209,8 @@ class SetorPusat(models.Model):
             self.bukti_transfer = ContentFile(output.read(), name=self.bukti_transfer.name)
         super().save(*args, **kwargs)
 
+    from django.db.models.signals import post_save
+    from django.core.files.base import ContentFile
     @receiver(post_save, sender=DetailLH)
     @receiver(post_save, sender=PengeluaranLH)
     def update_setor_pusat(sender, instance, **kwargs):

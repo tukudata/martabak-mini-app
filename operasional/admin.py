@@ -40,7 +40,7 @@ admin.site.index = dashboard_hari_ini
 class DetailLHInline(admin.TabularInline):     
     model = DetailLH
     extra = 7
-    max_num = 8
+    max_num = 7
 
     readonly_fields = ('display_target', 'display_sisa_rp', 'display_omzet', 'display_selisih', 'display_durasi_kerja')
     
