@@ -209,33 +209,6 @@ class SetorPusat(models.Model):
             self.bukti_transfer = ContentFile(output.read(), name=self.bukti_transfer.name)
         super().save(*args, **kwargs)
 
-    from django.db.models.signals import post_save
-    from django.core.files.base import ContentFile
-    @receiver(post_save, sender=DetailLH)
-    @receiver(post_save, sender=PengeluaranLH)
-    def update_setor_pusat(sender, instance, **kwargs):
-        # Ambil laporan induknya
-        induk = instance.laporan_induk
-    
-        # Hitung total cash dari semua DetailLH
-        total_cash = sum(d.cash_diterima for d in induk.detail_lh.all())
-    
-        # Hitung total pengeluaran dari semua PengeluaranLH
-        total_keluar = sum(p.nominal for p in induk.pengeluaran_op.all())
-    
-        # Hitung nominal setor
-        total_setor = total_cash - total_keluar
-    
-        # Update atau buat data di SetorPusat
-        SetorPusat.objects.update_or_create(
-            laporan_induk=induk,
-            defaults={
-                'total_cash_mitra': total_cash,
-                'total_pengeluaran': total_keluar,
-                'nominal_setor': total_setor
-            }
-        )
-
     class Meta:
         verbose_name_plural = "Setor Harian"
 
@@ -243,3 +216,38 @@ class RekapLaporan(models.Model):
     class Meta:
         verbose_name_plural = "Rekap Laporan"
         managed = False  # Penting: Django tidak akan buat tabel di database
+
+# PERBAIKI BUG SETOR PUSAT
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+@receiver(post_save, sender=DetailLH)
+@receiver(post_save, sender=PengeluaranLH)
+@receiver(post_delete, sender=DetailLH)
+@receiver(post_delete, sender=PengeluaranLH)
+def update_setor_pusat(sender, instance, **kwargs):
+    induk = instance.laporan_induk
+    
+    # Hitung ulang secara total dari database
+    # Menggunakan sum() langsung pada queryset lebih akurat daripada loop manual
+    from django.db.models import Sum
+    
+    # Ambil total cash dari detail
+    res_cash = induk.detail_lh.aggregate(total=Sum('cash_diterima'))
+    total_cash = res_cash['total'] or 0
+    
+    # Ambil total pengeluaran
+    res_keluar = induk.pengeluaran_op.aggregate(total=Sum('nominal'))
+    total_keluar = res_keluar['total'] or 0
+    
+    total_setor = total_cash - total_keluar
+    
+    # Update_or_create di sini
+    SetorPusat.objects.update_or_create(
+        laporan_induk=induk,
+        defaults={
+            'total_cash_mitra': total_cash,
+            'total_pengeluaran': total_keluar,
+            'nominal_setor': total_setor
+        }
+    )
