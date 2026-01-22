@@ -158,11 +158,17 @@ class SetorPusatInline(admin.StackedInline):
         nilai = cash - keluar
         
         return mark_safe(f"""
-            <strong style="color: #28a745; font-size: 18px; margin-right: 10px;">Rp {nilai:,}</strong>
-            <button type="button" onclick="navigator.clipboard.writeText('{nilai}')" 
-                style="cursor: pointer; padding: 4px 10px; border-radius: 4px; border: 1px solid #28a745; background: white; color: #28a745; font-weight: bold;">
-                📋 COPY NOMINAL
-            </button>
+            <div style="margin: 5px 0;">
+                <strong style="color: #28a745; font-size: 18px; margin-right: 10px; font-family: sans-serif;">
+                    Rp {nilai:,}
+                </strong>
+                <button type="button" onclick="navigator.clipboard.writeText('{nilai}')" 
+                    style="cursor: pointer; padding: 2px 6px; border-radius: 3px; border: 1px solid #28a745; 
+                           background: white; color: #28a745; font-size: 10px; font-weight: bold; 
+                           vertical-align: middle; transition: 0.2s;">
+                    📋 COPY
+                </button>
+            </div>
         """)
     display_wajib_setor.short_description = "JUMLAH TRANSFER"
 
