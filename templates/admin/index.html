@@ -1,51 +1,74 @@
 {% extends "admin/index.html" %}
 {% load i18n static humanize %}
 
+{% block extrahead %}
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
 {% block content_title %}
-<h4> Hari Ini </h4>
+<h1 class="text-2xl font-bold text-gray-800 mb-4">Hari Ini</h1>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-3 col-6">
-            <div class="small-box" style="background-color: #663399; color: white;">
-                <div class="inner">
-                    <h3>{{ total_cabang }}</h3>
-                    <p>Cabang Aktif</p>
+<div class="w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-indigo-700 rounded-2xl p-6 shadow-lg transform transition hover:scale-105">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-indigo-100 text-sm font-medium">Cabang Aktif</p>
+                    <h3 class="text-white text-3xl font-bold mt-1">{{ total_cabang }}</h3>
                 </div>
-                <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="bg-indigo-600 p-3 rounded-xl text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box" style="background-color: #1E90FF; color: white;">
-                <div class="inner">
-                    <h3>{{ total_karyawan }}</h3>
-                    <p>Mitra Aktif</p>
+
+        <div class="bg-blue-600 rounded-2xl p-6 shadow-lg transform transition hover:scale-105">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Mitra Aktif</p>
+                    <h3 class="text-white text-3xl font-bold mt-1">{{ total_karyawan }}</h3>
                 </div>
-                <div class="icon"><i class="fas fa-users"></i></div>
+                <div class="bg-blue-500 p-3 rounded-xl text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box" style="background-color: #28A745; color: white;">
-                <div class="inner">
-                    <h3>Rp {{ total_omzet|intcomma }}</h3>
-                    <p>Omzet Hari Ini</p>
+
+        <div class="bg-emerald-600 rounded-2xl p-6 shadow-lg transform transition hover:scale-105">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-emerald-100 text-sm font-medium">Omzet Hari Ini</p>
+                    <h3 class="text-white text-2xl font-bold mt-1">Rp {{ total_omzet|intcomma }}</h3>
                 </div>
-                <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="bg-emerald-500 p-3 rounded-xl text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
-            <div class="small-box" style="background-color: #DC3545; color: white;">
-                <div class="inner">
-                    <h3>{{ total_minus }}</h3>
-                    <p>Minus Hari Ini</p>
+
+        <div class="bg-rose-600 rounded-2xl p-6 shadow-lg transform transition hover:scale-105">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-rose-100 text-sm font-medium">Minus Hari Ini</p>
+                    <h3 class="text-white text-3xl font-bold mt-1">{{ total_minus }}</h3>
                 </div>
-                <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="bg-rose-500 p-3 rounded-xl text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
-
-{% block sidebar_second %}{% endblock %}
