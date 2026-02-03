@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError # edit pesan error
+from django.core.files.base import ContentFile
 from django.utils import timezone
 import io
 from PIL import Image
