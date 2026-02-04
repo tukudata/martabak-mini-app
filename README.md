@@ -6,41 +6,41 @@
 [![Storage](https://img.shields.io/badge/Storage-Supabase_S3-3ECF8E?logo=supabase)](https://supabase.com/)
 [![Deployment](https://img.shields.io/badge/Deploy-Railway-0B0D0E?logo=railway)](https://railway.app/)
 
-**MMDS** adalah sistem manajemen operasional terpadu yang dirancang khusus untuk bisnis kuliner (Martabak Mini). Aplikasi ini menangani seluruh alur bisnis mulai dari manajemen karyawan, pengelolaan cabang, hingga otomasi laporan harian dan perhitungan profit/loss.
+**MMDS** is an integrated operational management system designed specifically for the F&B industry (Martabak Mini). This application handles the entire business workflow, from employee management and branch coordination to automated daily reporting and profit/loss calculations.
 
 ---
 
-## 📸 Tampilan Aplikasi
+## 📸 App Screenshots
 
-### Dashboard Utama
-![Dashboard Utama](screenshots/dashboard.png)
+### Main Dashboard
+![Main Dashboard](screenshots/dashboard.png)
 
-### Evaluasi Performa Mitra
-![Evaluasi Mitra](screenshots/evaluasi.png)
+### Partner Performance Evaluation
+![Partner Evaluation](screenshots/evaluasi.png)
 
 ---
 
-## ✨ Fitur Utama
+## ✨ Key Features
 
-### 🏗️ Arsitektur Modular
-Aplikasi dibagi menjadi beberapa modul utama untuk skalabilitas:
-- **Perusahaan**: Manajemen Departemen, Karyawan (dengan ID otomatis `DSXXXX`), dan Cabang.
-- **Operasional**: Input Laporan Harian (LH), detail kehadiran mitra, dan pengeluaran operasional.
-- **Sistem**: Pengaturan pusat untuk rumus konstanta adonan, harga target per gram, dan skema bonus/gaji.
+### 🏗️ Modular Architecture
+The application is divided into core modules for maximum scalability:
+- **Corporate:** Management of Departments, Employees (with auto-generated IDs `DSXXXX`), and Branches.
+- **Operations:** Daily Report (DR) inputs, partner attendance tracking, and operational expense logs.
+- **System:** Centralized settings for dough constant formulas, target price per gram, and bonus/salary schemes.
 
-### 🧠 Otomasi & Logika Bisnis
-- **Smart Calculation**: Menghitung otomatis Target Omzet, Omzet Bruto, Sisa Adonan, dan Selisih (Plus/Minus) secara real-time saat data disimpan.
-- **Validasi Ketat**: Proteksi *double-entry* mitra untuk mencegah input ganda di cabang atau tanggal yang sama.
-- **Image Pipeline**: Automasi kompresi foto nota dan bukti transfer menggunakan Pillow sebelum diunggah ke cloud storage.
+### 🧠 Automation & Business Logic
+- **Smart Calculation:** Automatically calculates Target Revenue, Gross Revenue, Remaining Dough, and Discrepancies (Plus/Minus) in real-time as data is saved.
+- **Strict Validation:** Built-in partner **double-entry protection** to prevent duplicate inputs for the same branch or date.
+- **Image Pipeline:** Automated compression for receipts and transfer proof using **Pillow (PIL)** before uploading to cloud storage.
 
-### 📊 Dashboard Modern
-- Dashboard admin kustom menggunakan **Tailwind CSS** yang menampilkan metrik kunci (Total Omzet, Cabang Aktif, Mitra Aktif, dan Total Minus) secara visual.
-- Integrasi UI menggunakan **Jazzmin** untuk pengalaman administrasi yang profesional.
+### 📊 Modern Dashboard
+- Custom admin dashboard built with **Tailwind CSS**, visualizing key metrics such as Total Revenue, Active Branches, Active Partners, and Total Discrepancies.
+- Seamless UI integration using **Jazzmin** for a professional administrative experience.
 
-### 📈 Evaluasi & Rekapitulasi Mitra
-- **Dynamic Reporting**: Fitur evaluasi performa mitra berdasarkan rentang tanggal yang fleksibel.
-- **Analytics Table**: Menampilkan agregasi total durasi kerja (dalam jam), akumulasi omzet, hingga total minus per mitra secara otomatis.
-- **Branch Performance**: Monitoring jumlah keberangkatan harian per cabang untuk memantau produktivitas outlet.
+### 📈 Evaluation & Summaries
+- **Dynamic Reporting:** Performance evaluation features based on flexible date ranges.
+- **Analytics Table:** Automatically aggregates total work duration (in hours), accumulated revenue, and total "minus" per partner.
+- **Branch Performance:** Monitors daily branch departures to track outlet productivity.
 
 ---
 
@@ -53,20 +53,23 @@ Aplikasi dibagi menjadi beberapa modul utama untuk skalabilitas:
 
 ---
 
-## 🚀 Instalasi Lokal
+## 🚀 Local Installation
 
 1. **Clone Repository:**
    ```bash
    git clone [https://github.com/username/mmds-martabak.git](https://github.com/username/mmds-martabak.git)
    cd mmds-martabak
+
 2. **Setup Virtual Environment:**
    ```bash
    python -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
+
 3. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
-4. **Environment Variables: Buat file `.env` dan lengkapi data berikut:**
+
+4. **Environment Variables: Create a .env file and fill in the following:**
    ```bash
    SECRET_KEY=your_secret_key
    DEBUG=True
@@ -74,13 +77,12 @@ Aplikasi dibagi menjadi beberapa modul utama untuk skalabilitas:
    SUPABASE_ACCESS_KEY_ID=your_key
    SUPABASE_SECRET_ACCESS_KEY=your_secret
    SUPABASE_S3_ENDPOINT=your_endpoint
+
 5. **Run Migrations & Server:**
    ```bash
    python manage.py migrate
    python manage.py runserver
 
----
+## 📄 License
 
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah MIT License - bebas digunakan untuk pembelajaran atau pengembangan lebih lanjut dengan tetap mencantumkan atribusi penulis asli.
+This project is licensed under the MIT License - free to use for learning or further development provided that original attribution is maintained.
